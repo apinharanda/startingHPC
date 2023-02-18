@@ -1,0 +1,178 @@
+#Log in cluester
+
+ssh [UNI]@terremoto.rcs.columbia.edu
+
+#or Log into Ginsburg
+ssh [UNI]@ginsburg.rcs.columbia.edu
+
+###install programs needed for base genomics analysis
+#use conda virtual environments - it is the simplest way to make sure you have no dependency issues
+#https://docs.conda.io/en/latest/miniconda.html
+
+#While there are a limited number of programs installed for general use on our HPC cluster
+#Its better to maintain your own software
+#This gives control over the versions so it allow for more reproducible results
+#You can also maintain multiple environments for different applications and projects
+#It is recommended that you create a distinct conda environment for each project or application that you use
+#This way updating one set of libraries wonʼt break or affect the reproducibility of the results of other application
+#Use miniconda: it is a minimal distribution that includes the conda command, and just enough tooling to create new environments and populate them with the tools you select
+
+#As you will see, you create named environments with "conda"
+#There is always an environment named "base", which is special.
+#You should never install any packages or programs in base.
+#Use base only for creating new environments (with the conda create command, as youʼll see below), or to update your conda install, when youʼre advised to.
+#The python world moves fast, and incompatibilities mean that stuff breaks. By keeping base pristine, youʼll ensure that you wonʼt break it, which is tantamount to breaking your entire conda install.
+
+
+####Setup Steps
+#Download the latest miniconda distribution:
+cd /moto/palab/users/[UNI]/bin    # use your bin directory here, if you dont have one yet, create it with mkdir bin
+or for ginsburg
+cd /burg/palab/users/[UNI]/bin    # use your bin directory here, if you dont have one yet, create it with mkdir bin
+
+
+#Inside bin 
+wget https://repo.anaconda.com/miniconda/Miniconda3-latest-Linux-x86_64.sh
+
+chmod +x ./Miniconda3-latest-Linux-x86_64.sh
+./Miniconda3-latest-Linux-x86_64.sh
+
+#When prompted for the installation location, enter the path to your home directory, and keep the name miniconda3 .
+#For example
+>>> /moto/palab/users/[UNI]/bin/miniconda3
+
+#When asked, allow the installer to initialize Miniconda3
+# Do you wish the installer to initialize Miniconda3 by running conda init? 
+>>> yes
+
+#The path name that you specify when you install miniconda gets baked into the install.
+#Keep the miniconda3 installation to your "scratch" directory, and the symlink to it:
+
+cd #this brings you to home, which is different than scratch (check path by typing "pwd"
+ln -s /moto/palab/users/[UNI]/bin/miniconda3
+OR
+ln -s /burg/palab/users/[UNI]/bin/miniconda3
+
+#We wanted to have a link to miniconda to your home directory because it is conventional to have it findable at $HOME/miniconda3 
+#Other aspects of our HPC installation (e.g. our Open OnDemand installation) will assume this
+
+###Initialization Opt out
+#Log out and back in again, and set conda to NOT activate by default, and then log out and back in again one more time.
+
+exit
+... #log in again
+conda config --set auto_activate_base false
+exit
+
+#You should only use conda when you need it, and should opt-in explicitly
+#Automatically adding things to your path on log-in can slow things down substantially, and also cause you to become dependent on things you didnʼt even know you were using.
+
+###Create a base genomics environment & activate it
+
+conda create -n base_genomics
+conda activate base_genomics
+
+# Install programs of interest in environment
+
+conda install -n base_genomics -c bioconda samtools
+conda install -n base_genomics -c bioconda trim-galore
+conda install -n base_genomics -c bioconda cutadapt
+conda install -n base_genomics -c bioconda bwa 
+conda install -n base_genomics -c bioconda bcftools
+conda install -n base_genomics -c bioconda tabix
+conda install -n base_genomics -c bioconda picard
+conda install -n base_genomics -c bioconda seqtk
+conda install -n base_genomics -c bioconda star
+conda install -n base_genomics -c bioconda bedtools
+conda install -n base_genomics -c bioconda kallisto
+conda install -n base_genomics -c bioconda sra-tools
+conda install -n base_genomics -c bioconda htseq
+conda install -n base_genomics -c bioconda fastqc
+conda install -n base_genomics -c bioconda gatk
+
+####each time you log in you need to activate the specific environment (you can have several different ones)
+conda activate base_genomics
+
+###in 2020 gatk doesnt work as is from bioconda, so it was needed to download the release file 
+#after making sure you activated the env (see above)
+#download GenomeAnalysisTK-3.8-0-ge9d806836.tar.bz2 with wget into your bin I dont think this is the #case anymore 
+#below was how I did it at the time 
+#cd /moto/palab/users/[UNI]/bin/
+#
+#cp /moto/palab/users/apinharanda/bin/GenomeAnalysisTK-3.8-0-ge9d806836.tar.bz2 .
+#
+#then do gatk3-register + path where you put the tar.bz2
+#
+#gatk3-register /moto/home/ap3815/bin/GenomeAnalysisTK-3.8-0-ge9d806836.tar.bz2
+
+
+#to see the environments you have 
+conda env list
+
+#to run any program installed simply type the name of the program
+#for example after activate base_genomics
+
+samtools
+
+
+########to see what programs the cluster has installed
+
+module avail
+
+#and then to load one to directly use from the list
+
+module load [exact name listed]
+
+#this is great for a quick use sometimes but, for example, the version of R I was using stopped being listed here so I had to reinstall all my R packages again
+#which I found extremely annoying so now I also have a conda R enviroment
+
+###so, to create another virtual environment with R
+
+conda create -n R 
+conda install -n R -c conda-forge r-base
+conda activate R
+
+#if you then run R after activating the R environment installed here all the packages you then install in R (install.packages) will be part of the environment
+
+#####make an environment using python 2
+#some code/dependencies/etc are in python 2 and so all the pipeline has to be run in py2
+
+conda create -n py2 python=2.7 
+conda activate py2
+
+#and then to install python modules (for example numpy)
+conda install -n py2 numpy
+
+
+########## few resources that may be helpful:
+
+1) This one is for another HPC cluster called Habanero (instead of Terremoto) but the idea is the same:
+
+It stars with log in, and then it mentions conda installations.
+I actually prefer to use conda like in the text I shared.
+If you load it as a module from the HPC all the conda modules will be in $HOME and so you will eventually run out of space.
+It is better like I wrote to have it in scratch, with a sym link to $HOME.
+
+Anyway, the small section on Running a cluster job is quite a good summary
+
+https://rabernat.github.io/research_computing/introduction-to-the-habanero-hpc-cluster.html
+
+
+2) Here there is a more through explanation of Terremoto, some parts are too detailed and we don't necessarily use them (e.g. interactive jobs) but you can quickly read through it 
+
+https://confluence.columbia.edu/confluence/display/rcs/Terremoto+HPC+Cluster+User+Documentation
+
+
+3) When a job is submitted to the HPC, you can see its progress by:
+
+squeue -u [UNI]
+
+and you can cancel it by:
+
+scancel [job number]
+
+
+
+
+
+
