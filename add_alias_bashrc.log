@@ -1,0 +1,20 @@
+#it is quite annoying to type everytime the full path to scratch
+#so we can change our bash rc file in a way that we just type the alias
+
+#aliases in bash rc can be used as a shortcut anything
+
+#be very careful when changing your bash rc profile since it is really important
+
+
+#open file in vim and add the line below with whatever you want to add as an alias in the format alias [name] = [command]
+vi ~/.bashrc
+
+alias main='cd /moto/palab/users/apinharanda/'
+
+#then log off and log back in again
+
+#if you then type 
+
+main
+
+#you will be directly in /moto/palab/users/apinharanda/
