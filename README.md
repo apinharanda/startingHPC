@@ -25,8 +25,9 @@ squeue -u [UNI]
 and you can cancel it by:
 scancel [job number]
 
-2) follow the instructions in the log file Install_base_programs.log to start working on the HPC
+2) If you haven't used Linux before, please have a look at the pdfs from a introduction to Linux course I took a while back. We can go through it together
 
-3) To add alias to your bashrc check the log add_alias_bashrc.log
+3) follow the instructions in the log file Install_base_programs.log to start working on the HPC
 
+4) To add alias to your bashrc check the log add_alias_bashrc.log
 
